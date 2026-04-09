@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CyberGuard — Security Awareness Assistant</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="logo-row">
+      <div class="shield">🛡️</div>
+      <div>
+        <h1>CyberGuard</h1>
+        <p class="tagline">AI-powered cybersecurity awareness assistant</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" role="tab" onclick="switchTab('chat')" id="tab-btn-chat">
+      💬 Chat
+    </button>
+    <button class="tab" role="tab" onclick="switchTab('analyze')" id="tab-btn-analyze">
+      🔍 Threat Analyzer
+    </button>
+    <button class="tab" role="tab" onclick="switchTab('password')" id="tab-btn-password">
+      🔒 Password Check
+    </button>
+  </nav>
+
+  <!-- ── Chat Tab ─────────────────────────────────────────────────── -->
+  <section id="tab-chat" class="tab-panel active" role="tabpanel">
+    <div id="messages" class="messages" aria-live="polite" aria-label="Chat messages">
+      <div class="msg bot">
+        <div class="bot-label">CyberGuard</div>
+        Hi! I'm CyberGuard 🛡️. Ask me about phishing, malware, safe passwords,
+        suspicious emails, or any cybersecurity topic. I'm here to help you stay safe online.
+      </div>
+    </div>
+    <div class="input-row">
+      <input
+        id="chat-input"
+        type="text"
+        placeholder="Ask about phishing, malware, safe browsing…"
+        aria-label="Chat message"
+        maxlength="2000"
+        onkeypress="if(event.key==='Enter')sendChat()"
+      />
+      <button id="send-btn" onclick="sendChat()" aria-label="Send message">Send</button>
+    </div>
+    <div class="char-count"><span id="char-count">0</span> / 2000</div>
+  </section>
+
+  <!-- ── Analyze Tab ──────────────────────────────────────────────── -->
+  <section id="tab-analyze" class="tab-panel" role="tabpanel">
+    <label class="field-label" for="analyze-input">
+      Paste a suspicious email, SMS, or message to analyse:
+    </label>
+    <textarea
+      id="analyze-input"
+      rows="7"
+      placeholder="e.g. URGENT: Your account has been suspended. Share your OTP to restore access..."
+      maxlength="5000"
+    ></textarea>
+    <button class="full-btn" onclick="analyzeText()">Analyse for Threats</button>
+    <div id="analyze-result" class="result-box hidden"></div>
+  </section>
+
+  <!-- ── Password Tab ─────────────────────────────────────────────── -->
+  <section id="tab-password" class="tab-panel" role="tabpanel">
+    <label class="field-label" for="pw-input">Enter a password to evaluate:</label>
+    <div class="pw-row">
+      <input id="pw-input" type="password" placeholder="Type a password…"
+             oninput="checkPassword()" autocomplete="new-password"/>
+      <button class="toggle-vis" onclick="togglePwVisibility()" title="Show/hide password">👁</button>
+    </div>
+    <p class="privacy-note">🔒 Your password is never stored or sent anywhere.</p>
+    <div id="pw-result" class="result-box hidden"></div>
+  </section>
+
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
