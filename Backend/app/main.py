@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.services.ai_logic import get_ai_response
 app = FastAPI(
     title="CyberAware AI Bot API",
     description="The backend engine for our Cybersecurity Awareness Chatbot",
