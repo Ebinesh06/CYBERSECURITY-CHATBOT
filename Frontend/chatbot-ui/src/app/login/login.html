@@ -1,0 +1,30 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-top">
+      <div class="login-icon">🛡️</div>
+      <h1>Cybersecurity Login</h1>
+      <p>Access your secure assistant with a quick sign-in.</p>
+    </div>
+
+    <form class="login-form" (ngSubmit)="login()">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        name="username"
+        [(ngModel)]="username"
+        placeholder="Enter your username"
+      />
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        [(ngModel)]="password"
+        placeholder="Enter your password"
+      />
+
+      <button type="submit">Continue</button>
+    </form>
+  </div>
+</div>

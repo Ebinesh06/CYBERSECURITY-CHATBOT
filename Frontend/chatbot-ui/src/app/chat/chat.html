@@ -1,0 +1,69 @@
+<div class="chat-wrapper">
+  <div class="chat-toolbar">
+    <div class="chat-nav">
+      <button class="menu-button" aria-label="Open menu" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="menu-dropdown" [class.open]="menuOpen">
+        <div class="menu-profile">
+          <span class="menu-heading">Signed in as</span>
+          <strong class="menu-user">{{ username || 'Guest' }}</strong>
+        </div>
+        <button class="dropdown-item" (click)="toggleHistory()">History</button>
+        <button class="dropdown-item" (click)="clearHistory()">Clear History</button>
+        <button class="dropdown-item signout" (click)="signOut()">Sign Out</button>
+        <div class="history-panel" *ngIf="menuHistoryOpen">
+          <div class="history-header">
+            <span>Search History</span>
+            <button class="close-history" (click)="toggleHistory()">Close</button>
+          </div>
+          <div class="history-list" *ngIf="history.length; else noHistory">
+            <div *ngFor="let item of history" class="history-item">{{ item }}</div>
+          </div>
+          <ng-template #noHistory>
+            <div class="history-empty">No searches yet.</div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-title">🛡️ Cybersecurity Assistant</div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-body" #chatBody>
+      <div class="bg-icon">🛡️</div>
+      <div *ngFor="let msg of messages" 
+           [ngClass]="msg.sender === 'user' ? 'user-msg' : 'bot-msg'">
+        {{ msg.text }}
+      </div>
+
+      <!-- Typing animation -->
+      <div *ngIf="isTyping" class="bot-msg typing">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Quick Buttons -->
+    <div class="quick-buttons">
+      <button (click)="quickAsk('What is phishing?')">Phishing</button>
+      <button (click)="quickAsk('How to create a strong password?')">Passwords</button>
+      <button (click)="quickAsk('What is malware?')">Malware</button>
+      <button (click)="quickAsk('Explain ransomware')">Ransomware</button>
+      <button (click)="quickAsk('How to detect scams?')">Scams</button>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input">
+      <input [(ngModel)]="userInput" 
+             placeholder="Ask about cybersecurity..." 
+             (keyup.enter)="sendMessage()" />
+      <button (click)="sendMessage()">Send</button>
+    </div>
+  </div>
+</div>
