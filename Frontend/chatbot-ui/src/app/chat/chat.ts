@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
+import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-chat',
   standalone: true,
@@ -19,8 +19,7 @@ export class ChatComponent implements OnInit {
   menuHistoryOpen = false;
   history: string[] = [];
 
-  constructor(private router: Router) {}
-
+constructor(private router: Router, private http: HttpClient) {}
   ngOnInit() {
     this.username = localStorage.getItem('username')?.trim() || '';
     this.history = this.loadHistory();
@@ -29,24 +28,35 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  sendMessage() {
+sendMessage() {
     const userMsg = this.userInput.trim();
     if (!userMsg) return;
 
     this.addToHistory(userMsg);
-
     this.messages.push({ sender: 'user', text: userMsg });
     this.userInput = '';
-
     this.isTyping = true;
 
-    setTimeout(() => {
-      this.isTyping = false;
-      this.messages.push({
-        sender: 'bot',
-        text: this.getBotResponse(userMsg)
+    // Send the message to your FastAPI backend
+    // Use 'http://127.0.0.1:8000/chat' if testing on the same laptop
+    this.http.post<any>('http://127.0.0.1:8000/chat', { text: userMsg })
+      .subscribe({
+        next: (response) => {
+          this.isTyping = false;
+          this.messages.push({
+            sender: 'bot',
+            text: response.reply // Matches the "reply" key in your Python code
+          });
+        },
+        error: (error) => {
+          this.isTyping = false;
+          this.messages.push({
+            sender: 'bot',
+            text: 'Error: Could not connect to the backend server.'
+          });
+          console.error('Connection error:', error);
+        }
       });
-    }, 1200);
   }
 
   quickAsk(question: string) {
@@ -110,29 +120,29 @@ export class ChatComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  getBotResponse(input: string): string {
-    input = input.toLowerCase();
+  // getBotResponse(input: string): string {
+  //   input = input.toLowerCase();
 
-    if (input.includes('phishing')) {
-      return 'Phishing is a cyber attack where attackers trick users into revealing sensitive information via fake emails or websites.';
-    }
+  //   if (input.includes('phishing')) {
+  //     return 'Phishing is a cyber attack where attackers trick users into revealing sensitive information via fake emails or websites.';
+  //   }
 
-    if (input.includes('password')) {
-      return 'Use strong passwords with a mix of letters, numbers, and symbols. Avoid reusing passwords.';
-    }
+  //   if (input.includes('password')) {
+  //     return 'Use strong passwords with a mix of letters, numbers, and symbols. Avoid reusing passwords.';
+  //   }
 
-    if (input.includes('malware')) {
-      return 'Malware is malicious software designed to harm or exploit systems.';
-    }
+  //   if (input.includes('malware')) {
+  //     return 'Malware is malicious software designed to harm or exploit systems.';
+  //   }
 
-    if (input.includes('ransomware')) {
-      return 'Ransomware locks your data and demands payment to restore access.';
-    }
+  //   if (input.includes('ransomware')) {
+  //     return 'Ransomware locks your data and demands payment to restore access.';
+  //   }
 
-    if (input.includes('scam')) {
-      return 'Scams trick users into giving money or personal data. Always verify sources before trusting.';
-    }
+  //   if (input.includes('scam')) {
+  //     return 'Scams trick users into giving money or personal data. Always verify sources before trusting.';
+  //   }
 
-    return 'I can help with cybersecurity topics like phishing, malware, and password safety.';
-  }
+  //   return 'I can help with cybersecurity topics like phishing, malware, and password safety.';
+  // }
 }
