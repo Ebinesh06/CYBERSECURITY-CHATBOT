@@ -1,0 +1,9 @@
+A Distributed Denial of Service (DDoS) attack is a cyber attack where multiple systems flood a server, website, or network with excessive traffic, making it unavailable to users.
+
+Attackers often use botnets, which are networks of infected computers, to generate large volumes of traffic simultaneously.
+
+DDoS attacks can target websites, online services, or entire networks, causing downtime, financial loss, and disruption of services.
+
+There are different types of DDoS attacks, including volumetric attacks (overwhelming bandwidth), protocol attacks (exploiting server resources), and application-layer attacks (targeting specific applications).
+
+To defend against DDoS attacks, organizations can use firewalls, rate limiting, traffic filtering, load balancing, and cloud-based protection services.

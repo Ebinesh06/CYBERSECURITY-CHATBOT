@@ -1,0 +1,10 @@
+Phishing is a cyber attack where attackers trick users into revealing sensitive information like passwords, OTPs, or bank details. These attacks usually happen through fake emails, websites, or messages that look legitimate.
+Phishing is a cyber attack where attackers trick users into revealing sensitive information such as passwords, credit card details, or personal data.
+
+Attackers often send fake emails, messages, or create fake websites that look like legitimate services such as banks or social media platforms.
+
+These messages usually create urgency, such as "Your account will be blocked" or "Click here to verify immediately".
+
+Common signs of phishing include suspicious links, spelling mistakes, unknown senders, and requests for confidential information.
+
+To prevent phishing attacks, users should verify URLs, avoid clicking unknown links, enable two-factor authentication, and never share sensitive information through email or messages.
