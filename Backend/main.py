@@ -5,6 +5,7 @@ import chromadb
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 # --- PHASE 3: CONVERSATIONAL MEMORY ---
 # This dictionary will store history. Key = session_id, Value = list of messages
 chat_history = {}
@@ -36,7 +37,8 @@ tokenized_corpus = [doc.lower().split(" ") for doc in documents]
 bm25 = BM25Okapi(tokenized_corpus)
 
 # 3. Load the Re-ranker (The Quality Control)
-ranker = Ranker()
+# UPDATE THIS LINE:
+ranker = Ranker(model_name="ms-marco-TinyBERT-L-2-v2", cache_dir="./models")
 
 print(f"SUCCESS: Indexed {len(documents)} vulnerabilities for Precision Search.")
 # 4. Define the request structure
@@ -77,9 +79,10 @@ async def chat_endpoint(request: ChatRequest):
     user_message = request.message
     sid = request.session_id
 
-    # 1. Initialize session history if it doesn't exist
+    # 1. Initialize session if needed
     if sid not in chat_history:
         chat_history[sid] = []
+
 
     # --- PHASE 3: SEARCH BLENDING (The Fix for Context Loss) ---
     # We combine the current question with the last message to keep the CVE context
@@ -101,24 +104,37 @@ async def chat_endpoint(request: ChatRequest):
     context = "\n\n".join(final_context_list)
 
     # 5. Enhanced System Prompt (Forces AI to use provided context)
+    # Updated Step 5 in main.py
     system_prompt = (
-        "You are an Elite Cybersecurity Analyst. "
-        "STRICT RULE: Use the 'Retrieved Intelligence' AND the 'Chat History' to answer. "
-        "If the user asks how to fix or remediate, refer to the CVE in history. "
-        f"\n\nRetrieved Intelligence:\n{context}"
+    "You are an Elite Cybersecurity Analyst. "
+    "Use MARKDOWN (bullet points, bolding) to make your answers easy to scan. "
+    "STRICT RULE: Use the 'Retrieved Intelligence' AND the 'Chat History' to answer."
     )
-
     # 6. Assemble the Message History for Llama 3
     messages = [{"role": "system", "content": system_prompt}]
-    messages.extend(chat_history[sid][-4:]) # Last 2 exchanges
+    messages.extend(chat_history[sid][-4:]) 
     messages.append({"role": "user", "content": user_message})
 
-    # 7. Call LLaMA 3
-    response = ollama.chat(model="llama3", messages=messages)
-    bot_response = response['message']['content']
+    async def event_generator():
+        # FIX: Define this inside the function to avoid NameError
+        full_response = "" 
+        
+        try:
+            stream = ollama.chat(
+                model='llama3',
+                messages=messages,
+                stream=True,
+            )
+            for chunk in stream:
+                content = chunk['message'].get('content', '')
+                if content:
+                    full_response += content
+                    yield content  # Send to frontend instantly
+        except Exception as e:
+            yield f"Error: {str(e)}"
+        finally:
+            # Save to history only after the stream is done
+            chat_history[sid].append({"role": "user", "content": user_message})
+            chat_history[sid].append({"role": "assistant", "content": full_response})
 
-    # 8. Store Interaction in Memory
-    chat_history[sid].append({"role": "user", "content": user_message})
-    chat_history[sid].append({"role": "assistant", "content": bot_response})
-
-    return {"response": bot_response}
+    return StreamingResponse(event_generator(), media_type="text/plain")
